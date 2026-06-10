@@ -5,5 +5,7 @@
 
 -- FROM clientes;
 
+-- SELECT DISTINCT flTwitch,flEmail
 
-
+SELECT COUNT(DISTINCT IdCliente)
+FROM clientes;
