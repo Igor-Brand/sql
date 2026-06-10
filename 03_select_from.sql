@@ -1,0 +1,2 @@
+SELECT IdProduto, DescDescricaoProduto
+from produtos
