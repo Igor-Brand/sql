@@ -145,3 +145,42 @@ A estrutura final da query explicada segue esta ordem obrigatória para evitar e
 2.  **`FROM`** (tabela)
 3.  **`WHERE`** (filtros de linha)
 4.  **`LIMIT`** (restrição de quantidade - sempre por último).
+
+
+---
+
+## Dia 10 - Exercícios
+No dia 10, a aula foi dedicada à resolução de exercícios práticos para consolidar os conceitos de **SELECT**, **WHERE**, manipulação de colunas e filtragem de dados. Abaixo, explico as resoluções apresentadas para cada desafio:
+
+### 1. Lista de transações com apenas um ponto
+O objetivo era filtrar a tabela de transações para encontrar registros específicos de pontuação unitária.
+*   **Código:** `SELECT * FROM transacoes WHERE quantidade_pontos = 1`.
+*   **Explicação:** Utiliza-se a cláusula `WHERE` para igualar a coluna de pontos ao valor desejado. Uma boa prática mencionada é substituir o `*` pelas colunas `id_transacao` e `quantidade_pontos` para conferir o resultado.
+
+### 2. Pedidos realizados no fim de semana
+Este foi considerado um dos exercícios mais complexos por exigir a manipulação de strings e funções de data.
+*   **Lógica:** Primeiro, usa-se `substr` para fatiar a data de criação, depois `datetime` para converter o texto em formato de data e, por fim, `strftime('%w', ...)` para extrair o dia da semana.
+*   **Resolução:** Filtra-se onde o resultado da função seja **'0' (domingo)** ou **'6' (sábado)**. O instrutor demonstrou que é possível usar o **Alias** (apelido) da coluna criada diretamente no `WHERE` em alguns bancos, facilitando a leitura.
+
+### 3. Clientes com zero pontos
+Uma consulta simples para identificar usuários sem saldo de pontuação.
+*   **Código:** `SELECT id_cliente, quantidade_pontos FROM clientes WHERE quantidade_pontos = 0`.
+*   **Resultado:** A consulta retornou 648 clientes nessa condição.
+
+### 4. Clientes com 100 a 200 pontos (inclusive)
+O exercício explorou como selecionar intervalos de valores.
+*   **Resolução Explícita:** `WHERE quantidade_pontos >= 100 AND quantidade_pontos <= 200`.
+*   **Uso do BETWEEN:** Também foi apresentada a alternativa `WHERE quantidade_pontos BETWEEN 100 AND 200`. Embora o `BETWEEN` seja mais curto, o instrutor prefere a forma explícita para evitar confusões sobre se os limites são inclusivos ou não.
+
+### 5, 6 e 7. Filtros com nomes de produtos (LIKE)
+Foram realizados três exercícios focados no operador **`LIKE`** e no caractere coringa **`%`**.
+*   **Começa com "venda de":** `LIKE 'venda de%'`.
+*   **Termina com "lover":** `LIKE '%lover'`.
+*   **Contém "chapéu" em qualquer parte:** `LIKE '%chapéu%'`.
+*   **Dica extra:** Foi mostrado o uso do **`NOT LIKE`** para excluir registros que contenham determinado termo.
+
+### 8. Transações com o produto "Poney"
+Este exercício exigiu uma análise de **relacionamento entre tabelas**, pois a tabela de transações não contém o nome do produto, apenas o seu ID.
+*   **Passo 1:** Consultar a tabela de `produtos` para descobrir que o "resgate poney" possui o ID 15.
+*   **Passo 2:** Consultar a tabela `transacao_produtos` filtrando pelo `id_produto = 15`.
+*   **Conceito:** Essa necessidade de buscar um dado em uma tabela para filtrar outra introduz a lógica de **Chave Estrangeira** e prepara o terreno para o aprendizado de **JOINS** em aulas futuras.
