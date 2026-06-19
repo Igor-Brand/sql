@@ -64,3 +64,45 @@ Para reforçar o aprendizado, foi feita uma analogia sobre a execução do códi
 *   No ambiente de aula, esse "acelerar" é o atalho **Ctrl + Shift + Q**, que dispara o comando para o motor do banco de dados processar a informação.
 
 Em resumo, o Dia 07 consolidou a habilidade de navegar por diferentes tabelas do banco, manter o código documentado com comentários e respeitar a ordem obrigatória das cláusulas SQL para evitar erros de sintaxe.
+
+---
+## Dia 08 - WHERE
+No **Dia 08**, a aula avançou para o conceito fundamental de **filtragem de dados** utilizando a cláusula **`WHERE`**. Se o `SELECT` define quais colunas você quer ver, o `WHERE` define quais **linhas** (registros) devem ser retornadas com base em critérios específicos.
+
+Abaixo, apresento a explicação dos códigos e conceitos apresentados:
+
+### 1. A Cláusula WHERE e a Filtragem Básica
+A filtragem no SQL funciona de forma análoga aos filtros do Excel, permitindo isolar apenas os dados que atendem a uma condição.
+*   **Posicionamento:** O `WHERE` deve ser escrito após a cláusula `FROM`.
+*   **Sintaxe de Igualdade:** Para buscar um valor exato, utiliza-se o sinal de igual (ex: `WHERE desc_categoria_produto = 'rpg'`).
+*   **Uso de Aspas:** Valores de **texto (strings)** devem sempre estar entre **aspas simples** (`'`). Valores numéricos não precisam de aspas.
+*   **Case Sensitive:** O banco de dados diferencia maiúsculas de minúsculas no conteúdo das células. Buscar por 'RPG' (maiúsculo) não retornará resultados se no banco estiver gravado 'rpg' (minúsculo).
+
+### 2. Operadores de Comparação e Desigualdade
+A aula demonstrou como filtrar dados usando lógica matemática e de marcação:
+*   **Igualdade e Diferença:** Além do `=`, você pode usar `!=` ou `<>` para indicar "diferente de" (ex: `WHERE FL <> 0` para clientes com e-mail).
+*   **Grandezas:** Para campos numéricos, utilizam-se operadores como **`>` (maior)** ou **`>=` (maior ou igual)**. Por exemplo, `WHERE quantidade_pontos > 500` seleciona apenas clientes com pontuação superior a esse valor.
+
+### 3. Múltiplos Valores: OR e IN
+Quando você precisa buscar por vários valores possíveis para a mesma coluna, existem duas abordagens:
+*   **Operador `OR`:** Você pode repetir a coluna várias vezes (ex: `WHERE desk_produto = 'A' OR desk_produto = 'B'`).
+*   **Operador `IN`:** É uma forma mais elegante e performática de passar uma lista de valores. O código `WHERE desk_produto IN ('valor1', 'valor2', 'valor3')` instrui o banco a selecionar qualquer registro que esteja dentro dessa lista.
+
+### 4. Busca por Padrões: LIKE e o Coringa (%)
+Para buscar termos parciais dentro de um texto (como produtos que "contêm" determinada palavra), utiliza-se o operador **`LIKE`** em conjunto com o caractere **`%` (percentual)**, conhecido como **coringa**.
+*   **`LIKE 'turn%'`**: Busca palavras que **começam** com "turn".
+*   **`LIKE '%PP'`**: Busca palavras que **terminam** com "PP".
+*   **`LIKE '%item%'`**: Busca palavras que possuem "item" em **qualquer parte** do texto.
+*   **Aviso de Performance:** O uso do `LIKE` é **mais custoso** computacionalmente do que a igualdade (`=`) ou o `IN`, pois exige que o banco processe e compare cada string individualmente, o que pode gastar mais tempo e recursos em bases de dados muito grandes.
+
+### 5. Conceitos de Relacionamento (Contexto dos Filtros)
+Ao filtrar a tabela de transações, foram introduzidos conceitos importantes de estrutura de banco de dados:
+*   **Chave Primária (PK - Primary Key):** O identificador único de uma tabela (ex: `ID transação`).
+*   **Chave Estrangeira (FK - Foreign Key):** Quando o identificador de uma tabela (como o `ID cliente`) aparece em outra tabela (como a de `transacoes`) para criar um **relacionamento**, permitindo saber qual cliente realizou aquela transação específica.
+
+### Resumo da Ordem de Comando
+A estrutura final da query explicada segue esta ordem obrigatória para evitar erros de sintaxe:
+1.  **`SELECT`** (colunas)
+2.  **`FROM`** (tabela)
+3.  **`WHERE`** (filtros de linha)
+4.  **`LIMIT`** (restrição de quantidade - sempre por último).
