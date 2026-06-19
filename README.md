@@ -100,6 +100,45 @@ Ao filtrar a tabela de transações, foram introduzidos conceitos importantes de
 *   **Chave Primária (PK - Primary Key):** O identificador único de uma tabela (ex: `ID transação`).
 *   **Chave Estrangeira (FK - Foreign Key):** Quando o identificador de uma tabela (como o `ID cliente`) aparece em outra tabela (como a de `transacoes`) para criar um **relacionamento**, permitindo saber qual cliente realizou aquela transação específica.
 
+---
+
+## Dia 09 - Novas Colunas
+Na aula do **Dia 09**, o foco principal foi a **criação de novas colunas** e a manipulação de dados existentes através de expressões matemáticas e funções de texto e data. O instrutor enfatizou que essas operações não alteram a tabela original no banco de dados; elas apenas modificam como os dados são exibidos no resultado da sua consulta.
+
+Abaixo, apresento a explicação detalhada dos códigos e conceitos ensinados:
+
+### 1. Criando Colunas com Operações Matemáticas
+O primeiro passo foi mostrar como criar colunas calculadas a partir de campos já existentes.
+*   **Exemplo:** `SELECT *, quantidade_pontos + 10 FROM clientes`.
+*   **O que faz:** Seleciona todas as colunas originais (`*`) e adiciona uma coluna extra onde cada linha contém o valor da pontuação somado a 10.
+*   **Outras operações:** É possível realizar multiplicações (`* 2`) ou qualquer outra conta aritmética necessária para transformar o dado na hora da consulta.
+
+### 2. Renomeando Colunas (Alias)
+Como os nomes gerados por cálculos (ex: `quantidade_pontos + 10`) ficam visualmente poluídos, introduziu-se o conceito de **Alias (apelido)**.
+*   **Sintaxe:** Usa-se a palavra-chave **`AS`** (ex: `SELECT quantidade_pontos + 10 AS pontos_bonus`).
+*   **Boa prática:** Embora o SQL permita renomear sem o `AS`, o instrutor recomenda sempre usá-lo para tornar o código mais explícito e fácil de ler.
+
+### 3. Manipulação de Strings com `substr`
+Muitas vezes, os dados (como datas) estão salvos em formatos de texto longos e "sujos". Para resolver isso, usou-se a função **`substr`**.
+*   **Código:** `substr(DT_criacao, 1, 19)`.
+*   **O que faz:** "Fatia" o texto da coluna `DT_criacao`, começando na posição 1 e pegando os próximos 19 caracteres. Isso permite isolar apenas a parte da data e hora, descartando informações extras como milissegundos ou fusos horários indesejados.
+
+### 4. Conversão e Funções de Data (`datetime` e `strftime`)
+Para realizar operações inteligentes com datas (como saber o dia da semana), o texto fatiado precisa ser convertido em um tipo de dado de data real.
+*   **`datetime()`**: Converte a string fatiada em uma estrutura de data e hora que o banco de dados entende.
+*   **`strftime()`**: Esta função formata a data para extrair informações específicas. 
+    *   **Exemplo do Dia da Semana:** O código `strftime('%w', data)` foi usado para descobrir o dia da semana, onde **0 representa domingo**, 1 segunda, e assim por diante. No exemplo da aula, o resultado "4" confirmou que a data era uma quinta-feira.
+
+### 5. Funções em Camadas (Aninhamento)
+Um dos pontos mais avançados foi o **aninhamento de funções**, onde uma função é aplicada sobre o resultado de outra.
+*   **Estrutura lógica:** 
+    1.  Pega a coluna original.
+    2.  Fatia com `substr`.
+    3.  Converte com `datetime`.
+    4.  Extrai o dia da semana com `strftime`.
+
+O instrutor concluiu reforçando que, embora existam milhares de funções no SQL, não é necessário decorá-las; o importante é saber **como pesquisar** (usando termos como "how to" ou ferramentas de IA) para encontrar a função específica de que você precisa para cada "sabor" de SQL.
+
 ### Resumo da Ordem de Comando
 A estrutura final da query explicada segue esta ordem obrigatória para evitar erros de sintaxe:
 1.  **`SELECT`** (colunas)
