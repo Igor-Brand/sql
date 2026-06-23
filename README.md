@@ -280,6 +280,31 @@ ORDER BY quantidade_pontos DESC
 *   **`ELSE`**: É opcional e define o valor padrão caso nenhuma das condições anteriores seja atendida (se omitido, o resultado será `NULL`).
 *   **`END AS nome_grupo`**: Finaliza o bloco e dá um "apelido" (alias) à nova coluna criada.
 
+---
+## **Dia 13** - COUNT 
+o curso entra em uma nova fase focada em **agregações**, utilizando o SQL para resumir e sintetizar informações, de forma semelhante ao que é feito na estatística. O grande destaque desse dia é o comando **`COUNT`**, utilizado para contar registros em uma tabela.
+
+Abaixo, detalho os principais conceitos e códigos apresentados:
+
+### 1. O Conceito de Agregação
+Até então, as aulas focavam em selecionar, filtrar e ordenar linhas individuais. Agregação significa **"espremer" a tabela** para gerar um resumo (estatística) a partir de um conjunto de dados, resultando em um valor único que sintetiza a informação.
+
+### 2. O Comando `COUNT(*)`
+Para descobrir o número total de linhas em uma tabela sem precisar percorrê-la manualmente, utiliza-se o `COUNT`.
+*   **Código:** `SELECT COUNT(*) FROM clientes`.
+*   **O que faz:** Retorna a quantidade total de registros. No exemplo da aula, o resultado foi **3.505 clientes**.
+
+### 3. Diferenças entre `COUNT(*)`, `COUNT(1)` e `COUNT(coluna)`
+A aula explora as nuances de como o banco de dados processa a contagem:
+*   **`COUNT(*)` e `COUNT(1)`**: Em geral, funcionam da mesma forma na maioria dos motores de banco de dados, contando todas as linhas da tabela. O instrutor explica que o `COUNT(1)` é como se o banco criasse uma coluna temporária preenchida com o número "1" para cada linha e depois contasse essas ocorrências.
+*   **`COUNT(nome_da_coluna)`**: Diferente dos anteriores, este comando conta apenas os registros onde o valor da coluna especificada **não é nulo** (vazio).
+
+### 4. Performance e Boas Práticas
+O instrutor recomenda o uso de **`COUNT(*)`** ou **`COUNT(1)`** como prática padrão para saber o tamanho de uma tabela.
+*   **Metadados:** Algumas ferramentas de processamento de dados (como o Spark) ou motores de busca mais inteligentes conseguem ler a quantidade de linhas diretamente dos metadados da tabela, sem precisar varrê-la por inteiro, o que torna a consulta muito mais rápida em bases com milhões de registros.
+
+Em resumo, o Dia 13 ensina que o SQL não serve apenas para buscar dados brutos, mas também para **extrair inteligência e resumos quantitativos** de forma performática.
+
 ### Regras Importantes:
 1.  **Localização**: Como o `CASE WHEN` gera uma nova coluna, ele deve estar obrigatoriamente dentro da cláusula **`SELECT`**.
 2.  **Uma coluna por CASE**: Cada bloco que começa com `CASE` e termina com `END` resulta em **apenas uma única coluna** no resultado final, independentemente de quantos `WHEN` existam lá dentro.
