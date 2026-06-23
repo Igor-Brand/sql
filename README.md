@@ -420,3 +420,45 @@ Uma técnica útil apresentada é somar colunas de "flags" (que contêm apenas 0
 
 ### 5. Consideração sobre Zeros e Nulos
 A aula alerta que usar `ELSE 0` em agregações de soma é seguro, mas em operações de contagem (**`COUNT`**), o zero seria computado como um registro válido, o que poderia distorcer o resultado. Se o objetivo for contar apenas ocorrências específicas, o ideal é deixar o valor como nulo quando a condição não for atendida.
+
+---
+## **Dia 16** - GROUP BY
+
+a aula introduz o comando **`GROUP BY`**, que é fundamental para organizar e resumir dados por categorias específicas. Enquanto as aulas anteriores focaram em "espremer" a tabela inteira para gerar um único valor (agregação global), o `GROUP BY` permite fazer esse resumo para cada grupo de uma característica escolhida.
+
+Abaixo, detalho os conceitos e os códigos apresentados:
+
+### 1. O Conceito de Agrupamento
+O instrutor utiliza a analogia de dados físicos (dados de jogo) para explicar o conceito: em vez de filtrar apenas os dados vermelhos e contá-los, e depois repetir o processo para os pretos, você os **agrupa por cor** na mesa e conta todos os grupos de uma vez. No SQL, isso evita o chamado "trabalho de corno", que seria criar uma query com um filtro `WHERE` diferente para cada item que você deseja analisar.
+
+### 2. Mudança de Granularidade
+Um dos pontos mais importantes é a mudança de **granularidade** da tabela. Por exemplo, uma tabela de transações possui muitas linhas para o mesmo cliente (nível transacional). Ao usar o `GROUP BY id_cliente`, você "espreme" essas múltiplas linhas para que o resultado tenha apenas **uma linha por cliente**, consolidando as informações de pontos ou transações daquela pessoa.
+
+### 3. Exemplos de Código
+
+*   **Agrupamento Simples (Contagem por Produto):**
+    Para saber quantas vezes cada produto foi vendido sem precisar filtrar um por um, utiliza-se:
+    ```sql
+    SELECT id_produto, COUNT(*) 
+    FROM transacao_produto 
+    GROUP BY id_produto;
+    ```
+    Neste exemplo, o banco agrupa todas as linhas que possuem o mesmo `id_produto` e conta quantas existem em cada grupo.
+
+*   **Agrupamento com Soma e Múltiplas Agregações:**
+    Para identificar quanto cada cliente acumulou de pontos e quantas transações realizou em um mês específico:
+    ```sql
+    SELECT 
+        id_cliente, 
+        SUM(quantidade_pontos) AS total_pontos, 
+        COUNT(id_transacao) AS qtd_transacoes
+    FROM transacoes 
+    WHERE dt_criacao >= '2025-07-01' AND dt_criacao < '2025-08-01'
+    GROUP BY id_cliente;
+    ```
+    Aqui, o banco primeiro filtra os dados de julho (`WHERE`), depois separa os registros por cliente (`GROUP BY`) e, por fim, calcula a soma e a contagem para cada um deles.
+
+### 4. Regras e Boas Práticas
+*   **Colunas no SELECT vs. GROUP BY:** Toda coluna que aparecer no seu `SELECT` e que **não for uma função de agregação** (como SUM, COUNT, AVG) deve obrigatoriamente estar listada na cláusula `GROUP BY`.
+*   **Uso de Números (Posicionamento):** Em alguns bancos de dados, é possível usar o número da posição da coluna no `SELECT` dentro do `GROUP BY` (ex: `GROUP BY 1`), o que facilita a escrita, embora não seja aceito em todos os sistemas.
+*   **Ordem das Cláusulas:** O `GROUP BY` deve vir sempre após o `WHERE` e antes do `ORDER BY` ou `LIMIT`. A lógica de processamento é: primeiro o banco **busca** a tabela, **filtra** as linhas, **agrupa** as informações, **ordena** o resultado e, por fim, aplica o **limite** de linhas.
