@@ -462,3 +462,49 @@ Um dos pontos mais importantes é a mudança de **granularidade** da tabela. Por
 *   **Colunas no SELECT vs. GROUP BY:** Toda coluna que aparecer no seu `SELECT` e que **não for uma função de agregação** (como SUM, COUNT, AVG) deve obrigatoriamente estar listada na cláusula `GROUP BY`.
 *   **Uso de Números (Posicionamento):** Em alguns bancos de dados, é possível usar o número da posição da coluna no `SELECT` dentro do `GROUP BY` (ex: `GROUP BY 1`), o que facilita a escrita, embora não seja aceito em todos os sistemas.
 *   **Ordem das Cláusulas:** O `GROUP BY` deve vir sempre após o `WHERE` e antes do `ORDER BY` ou `LIMIT`. A lógica de processamento é: primeiro o banco **busca** a tabela, **filtra** as linhas, **agrupa** as informações, **ordena** o resultado e, por fim, aplica o **limite** de linhas.
+
+---
+## **Dia 17** - HAVING
+da aula foca no comando **`HAVING`**, que é essencial para filtrar dados que já foram agrupados por uma função de agregação (como `SUM`, `COUNT` ou `AVG`).
+
+Abaixo, apresento a explicação detalhada e os exemplos de código baseados no conteúdo da aula:
+
+### 1. O que é o `HAVING`?
+O instrutor define o `HAVING` como o **"WHERE do GROUP BY"**. Enquanto o `WHERE` filtra linhas individuais antes de qualquer processamento, o `HAVING` serve para filtrar os **resultados que saem de um agrupamento**.
+
+### 2. A diferença crucial entre `WHERE` e `HAVING`
+Uma dúvida comum é por que não podemos usar o `WHERE` para filtrar uma soma (ex: `WHERE SUM(pontos) > 4000`). A explicação técnica é baseada no momento da execução:
+*   **`WHERE`**: Filtra no momento em que os dados estão sendo "tirados do baú" (tabela). Nessa fase, o banco ainda não sabe qual é o valor total somado, pois ele ainda não agrupou nada.
+*   **`HAVING`**: Filtra depois que os dados já estão na "bandeja", após o banco ter feito o esforço de agrupar e somar os valores.
+
+### 3. Exemplo de Código: Filtrando Clientes com Alta Pontuação
+O exemplo prático da aula busca identificar apenas os clientes que acumularam mais de 4.000 pontos durante o mês de julho de 2025.
+
+```sql
+SELECT 
+    id_cliente, 
+    SUM(quantidade_pontos) AS total_pontos
+FROM transacoes
+WHERE dt_criacao >= '2025-07-01' AND dt_criacao < '2025-08-01'
+GROUP BY id_cliente
+HAVING SUM(quantidade_pontos) > 4000
+ORDER BY total_pontos DESC;
+```
+
+**Análise do código:**
+1.  **`SELECT`**: Seleciona o ID do cliente e a soma dos seus pontos.
+2.  **`FROM`**: Indica a tabela de transações.
+3.  **`WHERE`**: Faz o primeiro filtro, selecionando apenas as transações do mês de julho.
+4.  **`GROUP BY`**: Agrupa os resultados por cliente para que tenhamos uma linha por pessoa.
+5.  **`HAVING`**: Filtra os grupos resultantes, mantendo apenas aqueles cujo somatório de pontos é superior a 4.000.
+6.  **`ORDER BY`**: Ordena o resultado final do maior para o menor.
+
+### 4. Ordem Obrigatória das Cláusulas
+Para que o SQL funcione corretamente e não apresente erros de sintaxe, o instrutor reforça a estrutura de 90% das queries profissionais, seguindo esta ordem:
+1.  **`SELECT`** (Escolha das colunas/agregações)
+2.  **`FROM`** (Origem dos dados)
+3.  **`WHERE`** (Filtro inicial de linhas)
+4.  **`GROUP BY`** (Agrupamento)
+5.  **`HAVING`** (Filtro após o agrupamento)
+6.  **`ORDER BY`** (Ordenação do resultado filtrado)
+7.  **`LIMIT`** (Restrição da quantidade de linhas exibidas).
