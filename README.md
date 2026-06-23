@@ -508,3 +508,128 @@ Para que o SQL funcione corretamente e não apresente erros de sintaxe, o instru
 5.  **`HAVING`** (Filtro após o agrupamento)
 6.  **`ORDER BY`** (Ordenação do resultado filtrado)
 7.  **`LIMIT`** (Restrição da quantidade de linhas exibidas).
+
+---
+## dia 18 - Exercícios
+
+a aula foi dedicada à resolução de uma série de exercícios práticos focados principalmente em agrupamentos (**GROUP BY**) e lógica condicional (**CASE WHEN**).
+
+Abaixo estão os problemas propostos e os respectivos códigos utilizados para resolvê-los:
+
+### Exercício de Revisão (Pendente do Dia 09)
+**Problema:** Listar todas as transações adicionando uma coluna nova sinalizando "alto", "médio" ou "baixo" para o valor dos pontos.
+
+```sql
+SELECT 
+    id_transacao, 
+    quantidade_pontos,
+    CASE 
+        WHEN quantidade_pontos < 10 THEN 'baixo'
+        WHEN quantidade_pontos < 500 THEN 'médio'
+        ELSE 'alto'
+    END AS fl_valor_pontos
+FROM transacoes
+ORDER BY quantidade_pontos DESC;
+```
+
+### Exercícios de Agrupamento (Dia 18)
+
+**1. Quantos clientes têm e-mail cadastrado?**
+O instrutor demonstrou que isso pode ser feito de duas formas: somando a coluna de marcação (*flag*) ou filtrando e contando.
+
+```sql
+-- Opção 1: Somando a flag (mais performático)
+SELECT SUM(FL) AS total_com_email FROM clientes;
+
+-- Opção 2: Usando filtro e contagem
+SELECT COUNT(*) FROM clientes WHERE FL = 1;
+```
+
+**2. Qual cliente juntou mais pontos positivos no mês 05 de 2025?**
+Neste caso, é necessário filtrar o período, garantir que os pontos sejam positivos e agrupar por cliente.
+
+```sql
+SELECT 
+    id_cliente, 
+    SUM(quantidade_pontos) AS total_pontos
+FROM transacoes 
+WHERE dt_criacao >= '2025-05-01' AND dt_criacao < '2025-06-01'
+  AND quantidade_pontos > 0
+GROUP BY id_cliente
+ORDER BY total_pontos DESC
+LIMIT 1;
+```
+
+**3. Qual cliente fez mais transações no ano de 2024?**
+Para este exercício, foi utilizado o fatiamento da data para identificar o ano e a contagem de registros por cliente.
+
+```sql
+SELECT 
+    id_cliente, 
+    COUNT(*) AS qtd_transacoes
+FROM transacoes 
+WHERE substr(dt_criacao, 1, 4) = '2024'
+GROUP BY id_cliente
+ORDER BY qtd_transacoes DESC
+LIMIT 1;
+```
+
+**4. Quantos produtos são de RPG?**
+Pode ser resolvido com um filtro simples ou agrupando todas as categorias para ter uma visão geral.
+
+```sql
+-- Resposta direta
+SELECT COUNT(*) FROM produtos WHERE desc_categoria_produto = 'rpg';
+
+-- Visão geral por categoria
+SELECT desc_categoria_produto, COUNT(*) 
+FROM produtos 
+GROUP BY desc_categoria_produto;
+```
+
+**5. Qual o valor médio de pontos positivos por dia?**
+Este exercício exigiu somar todos os pontos positivos e dividir pela quantidade de dias únicos em que houve transações.
+
+```sql
+SELECT 
+    SUM(quantidade_pontos) / COUNT(DISTINCT substr(dt_criacao, 1, 10)) AS media_pontos_por_dia
+FROM transacoes 
+WHERE quantidade_pontos > 0;
+```
+
+**6. Qual o dia da semana que tem mais pedidos em 2025?**
+Foi utilizada a função `strftime` com o parâmetro `%w` para extrair o dia da semana (onde 0 é domingo e 1 é segunda-feira).
+
+```sql
+SELECT 
+    strftime('%w', substr(dt_criacao, 1, 19)) AS dia_semana,
+    COUNT(*) AS total_pedidos
+FROM transacoes 
+WHERE substr(dt_criacao, 1, 4) = '2025'
+GROUP BY dia_semana
+ORDER BY total_pedidos DESC;
+```
+
+**7. Qual o produto mais transacionado?**
+A consulta foca na contagem de registros por ID de produto na tabela de transação de produtos.
+
+```sql
+SELECT id_produto, COUNT(*) AS qtd_vendas
+FROM transacao_produto
+GROUP BY id_produto
+ORDER BY qtd_vendas DESC
+LIMIT 1;
+```
+
+**8. Qual o produto com mais pontos (valor) transacionados?**
+Diferente do anterior, este busca o volume total de pontos/valor, multiplicando o valor unitário pela quantidade vendida.
+
+```sql
+SELECT 
+    id_produto, 
+    SUM(valor_produto * quantidade_produto) AS total_valor
+FROM transacao_produto
+GROUP BY id_produto
+ORDER BY total_valor DESC
+LIMIT 1;
+```
