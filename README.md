@@ -184,3 +184,39 @@ Este exercício exigiu uma análise de **relacionamento entre tabelas**, pois a 
 *   **Passo 1:** Consultar a tabela de `produtos` para descobrir que o "resgate poney" possui o ID 15.
 *   **Passo 2:** Consultar a tabela `transacao_produtos` filtrando pelo `id_produto = 15`.
 *   **Conceito:** Essa necessidade de buscar um dado em uma tabela para filtrar outra introduz a lógica de **Chave Estrangeira** e prepara o terreno para o aprendizado de **JOINS** em aulas futuras.
+
+---
+## **Dia 11** - ORDER BY, 
+o foco da aula foi o comando **ORDER BY**, utilizado para ordenar os resultados de uma consulta, permitindo organizar os dados de forma crescente ou decrescente.
+
+Abaixo estão os principais códigos e conceitos explicados:
+
+### 1. Ordenação Básica (`ORDER BY`)
+O comando é inserido após o `FROM` (ou após o `WHERE`, se houver) para definir por qual coluna os dados devem ser organizados.
+*   **Ordem Crescente (Padrão):** Ao usar `ORDER BY quantidade_pontos`, o banco organiza do menor para o maior (ascendente) por padrão.
+*   **Ordem Decrescente (`DESC`):** Para ver os maiores valores primeiro (como os clientes com mais pontos), utiliza-se a palavra-chave `DESC` após o nome da coluna (ex: `ORDER BY quantidade_pontos DESC`).
+
+### 2. O "Top 10" (Combinando `ORDER BY` e `LIMIT`)
+Uma aplicação prática fundamental é a criação de rankings. Para encontrar os 10 clientes com maior saldo, o código segue esta ordem obrigatória:
+1.  **`SELECT * FROM clientes`**
+2.  **`ORDER BY quantidade_pontos DESC`** (ordena do maior para o menor)
+3.  **`LIMIT 10`** (pega apenas os 10 primeiros após a ordenação).
+
+### 3. Ordenação por Múltiplos Critérios
+É possível ordenar por mais de uma coluna simultaneamente, separando-as por vírgula. Isso é útil quando há "empates" no primeiro critério.
+*   **Exemplo:** `ORDER BY dt_criacao ASC, quantidade_pontos DESC`.
+*   Neste caso, o banco organiza primeiro pelos clientes mais antigos (`ASC` ou ascendente) e, para aqueles cadastrados no mesmo momento, organiza quem tem mais pontos primeiro (`DESC`).
+*   **Nota sobre datas:** Como as datas estão no formato "ano-mês-dia", o banco consegue ordená-las corretamente como texto.
+
+### 4. Integrando com Filtros (`WHERE`)
+Quando você precisa filtrar e ordenar ao mesmo tempo, o **`WHERE` deve vir sempre antes do `ORDER BY`**.
+*   **Exemplo:** `SELECT * FROM clientes WHERE fl_twitch = 1 ORDER BY dt_criacao ASC`.
+*   **Vantagem de Performance:** O instrutor explica que usar o `WHERE` antes é uma boa prática porque o banco primeiro filtra os dados (diminuindo o volume na memória) e só depois faz o esforço computacional de ordenar o que restou.
+
+### 5. Regras de Estrutura
+O SQL segue uma estrutura rígida para evitar erros de sintaxe. Em uma única instrução `SELECT`, você não pode repetir cláusulas (ter dois `WHERE` ou dois `ORDER BY`), mas sim adicionar múltiplas condições ou colunas dentro de cada uma delas. A ordem correta das cláusulas aprendidas até agora é:
+1.  **SELECT** (colunas)
+2.  **FROM** (tabela)
+3.  **WHERE** (filtros)
+4.  **ORDER BY** (ordenação)
+5.  **LIMIT** (restrição de linhas).
