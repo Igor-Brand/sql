@@ -365,3 +365,58 @@ WHERE dt_criacao >= '2025-07-01'
 
 **Ponto importante abordado na aula:**
 O instrutor demonstrou que, enquanto o total de transações (`COUNT(*)`) em julho de 2025 foi de **5.674**, o número de clientes únicos que realizaram essas transações foi de apenas **287**. Isso acontece porque um mesmo cliente pode realizar várias transações em um único mês.
+
+---
+## **Dia 15** - Estatísticas
+
+a aula foca em **estatísticas e funções de agregação**, que servem para sumarizar dados e extrair inteligência, "espremendo" a tabela para gerar um resumo em vez de apenas listar linhas individuais.
+
+Abaixo estão as explicações e exemplos de código detalhados na aula:
+
+### 1. A Função SUM (Soma)
+A função **`SUM`** é utilizada para somar valores numéricos de uma coluna. Um exemplo prático é calcular o saldo de pontos ganhos em um determinado mês.
+
+*   **Exemplo de soma simples:**
+    ```sql
+    SELECT SUM(quantidade_pontos) 
+    FROM transacoes 
+    WHERE dt_criacao >= '2025-07-01' AND dt_criacao < '2025-08-01'
+    ```.
+
+### 2. Agregação Condicional com CASE WHEN
+O instrutor explica que, como existem ganhos e trocas de pontos (valores positivos e negativos), somar a coluna inteira resulta no saldo líquido. Para separar entradas de saídas na mesma consulta, utiliza-se o **`CASE WHEN`** dentro do **`SUM`**.
+
+*   **Exemplo de resumo de entradas e saídas:**
+    ```sql
+    SELECT 
+        SUM(CASE WHEN quantidade_pontos > 0 THEN quantidade_pontos ELSE 0 END) AS pontos_positivos,
+        SUM(CASE WHEN quantidade_pontos < 0 THEN quantidade_pontos ELSE 0 END) AS pontos_negativos
+    FROM transacoes
+    WHERE dt_criacao >= '2025-07-01' AND dt_criacao < '2025-08-01'
+    ```.
+
+### 3. Média (AVG), Mínimo (MIN) e Máximo (MAX)
+Estas funções ajudam a entender a distribuição dos dados na carteira dos clientes. 
+*   **`AVG`**: Calcula a média. No SQLite, multiplica-se por `1.0` para garantir que o resultado tenha casas decimais (float).
+*   **`MIN` e `MAX`**: Identificam, respectivamente, o menor e o maior valor de uma coluna.
+
+*   **Exemplo de estatísticas de carteira:**
+    ```sql
+    SELECT 
+        AVG(quantidade_pontos * 1.0) AS media_carteira,
+        MIN(quantidade_pontos) AS min_carteira,
+        MAX(quantidade_pontos) AS max_carteira
+    FROM clientes
+    ```.
+
+### 4. Soma de Flags (Marcações)
+Uma técnica útil apresentada é somar colunas de "flags" (que contêm apenas 0 ou 1). **Somar uma flag é o mesmo que contar** quantos usuários possuem aquela característica ativa.
+
+*   **Exemplo para contar usuários da Twitch:**
+    ```sql
+    SELECT SUM(fl_twitch) AS total_usuarios_twitch 
+    FROM clientes
+    ```.
+
+### 5. Consideração sobre Zeros e Nulos
+A aula alerta que usar `ELSE 0` em agregações de soma é seguro, mas em operações de contagem (**`COUNT`**), o zero seria computado como um registro válido, o que poderia distorcer o resultado. Se o objetivo for contar apenas ocorrências específicas, o ideal é deixar o valor como nulo quando a condição não for atendida.
