@@ -309,3 +309,59 @@ Em resumo, o Dia 13 ensina que o SQL não serve apenas para buscar dados brutos,
 1.  **Localização**: Como o `CASE WHEN` gera uma nova coluna, ele deve estar obrigatoriamente dentro da cláusula **`SELECT`**.
 2.  **Uma coluna por CASE**: Cada bloco que começa com `CASE` e termina com `END` resulta em **apenas uma única coluna** no resultado final, independentemente de quantos `WHEN` existam lá dentro.
 3.  **Múltiplas colunas**: Você pode usar vários blocos `CASE` na mesma consulta para criar diferentes marcações (flags), como uma coluna para identificar se o cliente é "poney" e outra para identificar se é "mago".
+
+---
+
+## **Dia 14** - DISTINCT
+o foco principal da aula foi o comando **`DISTINCT`**, utilizado para remover duplicidades e retornar registros únicos de uma consulta, além de como combiná-lo com funções de agregação como o `COUNT`.
+
+Abaixo estão os detalhes dos códigos e conceitos apresentados:
+
+### 1. O Conceito de `DISTINCT`
+O instrutor esclarece que o `DISTINCT` não atua apenas em uma coluna isolada, mas sim na **combinação de todas as colunas** selecionadas na linha da query.
+*   **Deduplicação de Linhas:** Se você selecionar `DISTINCT fl_twitch, fl_email`, o banco de dados retornará todas as combinações únicas entre essas duas colunas, eliminando as repetições.
+*   **Analogia dos Dados:** Para facilitar o entendimento, foi usada a analogia de dados físicos:
+    *   **Distinto por cor:** Retorna um representante de cada cor existente (ex: um vermelho, um preto, um cinza).
+    *   **Distinto por faces:** Retorna um representante para cada quantidade de faces (ex: um de 6 faces, um de 20 faces).
+    *   **Distinto por cor e faces:** Retorna combinações únicas entre os dois atributos.
+
+### 2. Contagem de Registros Únicos (`COUNT DISTINCT`)
+A aplicação mais comum demonstrada foi o uso do `DISTINCT` dentro da função `COUNT` para descobrir o número de entidades únicas em uma tabela de movimentações.
+*   **Exemplo Prático:** Na tabela de transações, uma mesma pessoa pode aparecer várias vezes. Para saber **quantos clientes únicos** transacionaram em um período, utiliza-se:
+    ```sql
+    SELECT COUNT(DISTINCT id_cliente) 
+    FROM transacoes 
+    WHERE dt_criacao >= '2025-07-01' AND dt_criacao < '2025-08-01'
+    ```
+*   **Resultado:** Enquanto o `COUNT(*)` retornou 5.674 transações totais em julho de 2025, o `COUNT(DISTINCT id_cliente)` revelou que apenas **287 clientes distintos** foram responsáveis por esse volume.
+
+### 3. Comparação de Datas como Strings
+A aula também reforçou como realizar filtros de data sem precisar de funções complexas de conversão, tratando-as como texto.
+*   **Lógica de Grandeza:** O banco de dados consegue comparar strings de data no formato "ano-mês-dia" (ex: `'2025-07-01'`) por ordem lexicográfica, da mesma forma que a letra "a" vem antes da letra "b".
+*   **Filtro de Mês:** Para capturar exatamente um mês, a recomendação é usar o sinal de **maior ou igual** para o início do mês e **menor** para o primeiro dia do mês seguinte.
+
+### 4. Diferença entre Chave Primária e Distinct
+O instrutor explicou que aplicar `DISTINCT` em uma **Chave Primária (PK)**, como o `id_cliente` na tabela de clientes, não altera o resultado da contagem, pois por definição a chave primária já é única e não se repete naquela tabela. O valor do `DISTINCT` aparece realmente quando olhamos para **Chaves Estrangeiras (FK)** ou atributos que se repetem.
+
+Em resumo, o Dia 14 ensinou que o `DISTINCT` é a ferramenta essencial para "limpar" o resultado de uma consulta, garantindo que você veja apenas os valores ou combinações de valores que são de fato diferentes entre si.
+
+Um exemplo prático e detalhado apresentado nesta aula foi para descobrir quantos **clientes únicos** realizaram transações em um mês específico (julho de 2025), filtrando os dados da tabela de transações.
+
+Abaixo está o exemplo de código utilizado:
+
+```sql
+SELECT 
+    COUNT(DISTINCT id_cliente) 
+FROM transacoes 
+WHERE dt_criacao >= '2025-07-01' 
+  AND dt_criacao < '2025-08-01'
+```
+
+### Explicação do que o código faz:
+
+*   **`SELECT COUNT(DISTINCT id_cliente)`**: Esta parte do código primeiro identifica todos os IDs de clientes que aparecem na tabela (`DISTINCT id_cliente`) e depois conta quantos são únicos. Sem o `DISTINCT`, o banco contaria todas as linhas da tabela, o que resultaria no número total de transações, e não no número de clientes.
+*   **`FROM transacoes`**: Indica que os dados estão sendo retirados da tabela de transações.
+*   **`WHERE dt_criacao >= '2025-07-01' AND dt_criacao < '2025-08-01'`**: Filtra as transações para abranger exatamente o mês de julho de 2025. O instrutor explica que as datas são comparadas como strings (texto), onde o banco entende que '2025-07-01' vem antes de '2025-08-01'.
+
+**Ponto importante abordado na aula:**
+O instrutor demonstrou que, enquanto o total de transações (`COUNT(*)`) em julho de 2025 foi de **5.674**, o número de clientes únicos que realizaram essas transações foi de apenas **287**. Isso acontece porque um mesmo cliente pode realizar várias transações em um único mês.
