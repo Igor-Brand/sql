@@ -220,3 +220,67 @@ O SQL segue uma estrutura rígida para evitar erros de sintaxe. Em uma única in
 3.  **WHERE** (filtros)
 4.  **ORDER BY** (ordenação)
 5.  **LIMIT** (restrição de linhas).
+
+---
+
+## **Dia 12** - CASE WHEN
+ a aula foca no comando **`CASE WHEN`**, que introduz lógica condicional às consultas SQL. Ele funciona de forma análoga ao "se" (`if`) de linguagens de programação, permitindo atribuir valores a uma nova coluna com base em condições específicas.
+
+Abaixo, detalho os códigos e conceitos apresentados:
+
+### 1. Estrutura Básica do CASE WHEN
+O comando é utilizado para criar colunas calculadas logicamente. A estrutura básica segue este padrão:
+*   **`CASE`**: Inicia o bloco lógico.
+*   **`WHEN [condição] THEN [resultado]`**: Define o critério e o que deve ser exibido caso ele seja atendido.
+*   **`ELSE [resultado]`**: (Opcional) Define um valor padrão caso nenhuma das condições anteriores seja verdadeira. Se omitido e nada for atendido, o banco retorna **`NULL`**.
+*   **`END`**: Finaliza o bloco do `CASE`.
+*   **`AS [nome_da_coluna]`**: Define o apelido (alias) para a nova coluna criada.
+
+### 2. A Importância da Ordem das Condições
+Uma regra fundamental explicada é que o banco de dados avalia as condições **na ordem em que foram escritas**. 
+*   Se a primeira condição for atendida, o banco atribui o valor e **ignora o restante** do `CASE` para aquela linha. 
+*   Isso permite simplificar o código: em vez de escrever intervalos complexos (como "entre 500 e 1000"), você pode apenas colocar `WHEN pontos <= 500 THEN 'Poney'` seguido de `WHEN pontos <= 1000 THEN 'Poney Premium'`, pois quem tem menos de 500 já terá sido capturado pela primeira regra.
+
+### 3. Exemplo Prático: Faixas de Pontuação
+O código principal da aula classificou os clientes em "classes sociais" baseadas no saldo de pontos:
+*   **Poney**: Até 500 pontos.
+*   **Poney Premium**: Entre 501 e 1.000 pontos.
+*   **Mago Aprendiz**: Entre 1.001 e 5.000 pontos.
+*   **Mago Mestre**: Entre 5.001 e 10.000 pontos.
+*   **Mago Supremo**: Mais de 10.000 pontos (definido através do `ELSE`).
+
+### 4. Criação de Múltiplas Colunas (Flags)
+O instrutor reforçou que **cada bloco `CASE` gera exatamente uma coluna** no resultado final. No entanto, você pode usar vários `CASE` na mesma consulta para criar colunas distintas, como "marcações" (flags) binárias:
+*   Um `CASE` para criar a coluna `fl_poney` (valor 1 se for poney, 0 se não).
+*   Outro `CASE` para a coluna `fl_mago` (valor 1 se for mago, 0 se não).
+
+### 5. Posicionamento e Regras de Uso
+Como o `CASE WHEN` é uma ferramenta para selecionar/gerar dados, ele deve estar obrigatoriamente dentro da cláusula **`SELECT`** (antes do `FROM`). Além disso, embora um `CASE` resulte em apenas uma coluna, você pode comparar múltiplas colunas diferentes dentro de seus `WHEN` para chegar a um resultado.
+
+
+```sql
+SELECT 
+    idCliente, 
+    quantidade_pontos,
+    CASE 
+        WHEN quantidade_pontos <= 500 THEN 'poney'
+        WHEN quantidade_pontos <= 1000 THEN 'poney premium'
+        WHEN quantidade_pontos <= 5000 THEN 'mago aprendiz'
+        WHEN quantidade_pontos <= 10000 THEN 'mago mestre'
+        ELSE 'mago supremo'
+    END AS nome_grupo
+FROM clientes
+ORDER BY quantidade_pontos DESC
+```
+
+### Explicação dos componentes do código:
+
+*   **`CASE`**: Inicia a cláusula de condição.
+*   **`WHEN [condição] THEN [resultado]`**: Define o critério. O banco de dados testa as condições na **ordem em que foram escritas**; se a primeira for verdadeira, ele atribui o valor e ignora as demais para aquela linha.
+*   **`ELSE`**: É opcional e define o valor padrão caso nenhuma das condições anteriores seja atendida (se omitido, o resultado será `NULL`).
+*   **`END AS nome_grupo`**: Finaliza o bloco e dá um "apelido" (alias) à nova coluna criada.
+
+### Regras Importantes:
+1.  **Localização**: Como o `CASE WHEN` gera uma nova coluna, ele deve estar obrigatoriamente dentro da cláusula **`SELECT`**.
+2.  **Uma coluna por CASE**: Cada bloco que começa com `CASE` e termina com `END` resulta em **apenas uma única coluna** no resultado final, independentemente de quantos `WHEN` existam lá dentro.
+3.  **Múltiplas colunas**: Você pode usar vários blocos `CASE` na mesma consulta para criar diferentes marcações (flags), como uma coluna para identificar se o cliente é "poney" e outra para identificar se é "mago".
